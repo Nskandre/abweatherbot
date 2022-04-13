@@ -1,21 +1,20 @@
+import telebot
+from telebot import types
+from settings import OPEN_WEATHER_TOKEN
 import requests
 import datetime
-from settings import OPEN_WEATHER_TOKEN, TG_TOKEN
-from aiogram import Bot, types
-from aiogram.dispatcher import Dispatcher
-from aiogram.utils import executor
 
-bot = Bot(token=TG_TOKEN)
-dp = Dispatcher(bot)
+token = '5276898707:AAGRP_TsLPKpk30AK5VoDHnMb-TesKehMZU'
+bot = telebot.TeleBot(token, parse_mode=None)
 
 
-@dp.message_handler(commands=["start"])
-async def start_command(message: types.Message):
-    await message.reply("Напиши название города и я пришлю тебя сводку погоды!")
+@bot.message_handler(commands=['start'])
+def send_welcome(message):
+    bot.reply_to(message, "Hello! Напиши мне название города и я пришлю тебе сводку погоды в нем! ")
 
 
-@dp.message_handler()
-async def get_weather(message: types.Message):
+@bot.message_handler(content_types=['text'])
+def send_message(message):
     code_to_smile = {
         'Clear': 'Ясно \U00002600',
         'Clouds': 'Облачно \U00002601',
@@ -48,22 +47,19 @@ async def get_weather(message: types.Message):
         else:
             wd = 'Посмотри в окно, не пойму, что там за погода!'
 
-        await message.reply(f'''{datetime.datetime.now().strftime('%Y-%m-%d %H:%M')} Погода в {user_city}: 
-        {wd}
-        Температура: {temp} °C
-        Ощущается как: {feels_like} °C
-        Скорость ветра {wind} м/c
-        Влажность {humidity} %
-        Давление {round(pressure / 1.33322387415)} мм.рт.ст
-        Восход {sunrise} 
-        Закат {sunset}
-        Продолжительность дня {length} 
-
-        Отличного Вам дня!!!''')
+        bot.send_message(message.chat.id, f'''{datetime.datetime.now().strftime('%Y-%m-%d %H:%M')} Погода в {user_city}: 
+            {wd}
+            Температура: {temp} °C
+            Ощущается как: {feels_like} °C
+            Скорость ветра {wind} м/c
+            Влажность {humidity} %
+            Давление {round(pressure / 1.33322387415)} мм.рт.ст
+            Восход {sunrise} 
+            Закат {sunset}
+            Продолжительность дня {length}''')
 
     except:
-        await message.reply('\U00002620 Проверьте название города \U00002620')
+        bot.send_message(message.chat.id, '\U00002620 Проверьте название города \U00002620')
 
 
-if __name__ == '__main__':
-    executor.start_polling(dp)
+bot.polling()

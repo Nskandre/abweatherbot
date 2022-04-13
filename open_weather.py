@@ -2,6 +2,7 @@ import requests
 import datetime
 from pprint import pprint
 from settings import OPEN_WEATHER_TOKEN
+# from tg_bot import CITY
 
 
 def get_weather(city, OPEN_WEATHER_TOKEN):
